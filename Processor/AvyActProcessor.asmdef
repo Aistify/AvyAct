@@ -1,0 +1,19 @@
+{
+    "name": "AvyActProcessor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300",
+        "GUID:d689052aa981bf8459346a530f6e6678",
+        "GUID:04a7e5cf006503242b1db329a84d694d",
+        "GUID:cafbb1c157c3fa646b0d877caf709f5a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,17 @@
+{
+    "name": "AvyActActionEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:cafbb1c157c3fa646b0d877caf709f5a",
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
