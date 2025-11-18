@@ -369,50 +369,39 @@ namespace A1ST.AvyAct.Processor
             var propagatedClip = new AnimationClip { name = $"{inClip.name} Propagated" };
             propagatedClip.ClearCurves();
 
-            foreach (var binding in tempBindingsL)
-            foreach (var gameObj in propagationRenderers)
+            var avatarTransform = propagationRenderers[0].transform;
+            while (avatarTransform.parent != null)
             {
-                var (relativePath, avatarIndex) = GetGameObjectPath(gameObj.transform);
-
-                Debug.Log("Relative Path Before / is " + relativePath);
-
-                relativePath = relativePath.Substring(
-                    relativePath.IndexOf("/", StringComparison.Ordinal) + 1
-                );
-
-                Debug.Log("Relative Path After change is " + relativePath);
-
-                // relativePath = string.Join("/", relativePath.Split('/').Skip(avatarIndex));
-                //
-                // Debug.Log(relativePath + 3);
-
-                propagatedClip.SetCurve(
-                    relativePath,
-                    typeof(SkinnedMeshRenderer),
-                    binding.PropertyName,
-                    binding.Curve
-                );
+                if (avatarTransform.TryGetComponent<VRCAvatarDescriptor>(out _))
+                    break;
+                avatarTransform = avatarTransform.parent;
             }
+
+            foreach (var binding in tempBindingsL)
+                foreach (var relativePath in propagationRenderers.Select(gameObj => GetRelativePath(gameObj.transform, avatarTransform)))
+                {
+                    propagatedClip.SetCurve(
+                        relativePath,
+                        typeof(SkinnedMeshRenderer),
+                        binding.PropertyName,
+                        binding.Curve
+                    );
+                }
 
             return propagatedClip;
 
-            (string relativePath, int avatarIndex) GetGameObjectPath(Transform targetTransform)
+            string GetRelativePath(Transform target, Transform root)
             {
-                var avatarIndex = 0;
-                var i = 0;
-                var relativePath = targetTransform.name;
-                while (targetTransform.parent != null)
+                var path = target.name;
+                var current = target.parent;
+
+                while (current != null && current != root)
                 {
-                    if (targetTransform.GetComponent<VRCAvatarDescriptor>())
-                        avatarIndex = i;
-                    targetTransform = targetTransform.parent;
-                    relativePath = targetTransform.name + "/" + relativePath;
-                    i += 1;
+                    path = current.name + "/" + path;
+                    current = current.parent;
                 }
 
-                avatarIndex = i - avatarIndex;
-
-                return (relativePath, avatarIndex);
+                return path;
             }
         }
     }
