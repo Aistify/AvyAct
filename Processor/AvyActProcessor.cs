@@ -31,7 +31,7 @@ namespace A1ST.AvyAct.Processor
                 if (Actions.Count == 1)
                 {
                     if (
-                        Actions[0].menu.Control.type
+                        Actions[0].menu.Control!.type
                         == VRCExpressionsMenu.Control.ControlType.RadialPuppet
                     )
                         Type = ToggleType.RadialSlider;
@@ -45,7 +45,7 @@ namespace A1ST.AvyAct.Processor
                 else
                 {
                     if (
-                        Actions[0].menu.Control.type
+                        Actions[0].menu.Control!.type
                         is VRCExpressionsMenu.Control.ControlType.Button
                             or VRCExpressionsMenu.Control.ControlType.Toggle
                     )
@@ -57,7 +57,7 @@ namespace A1ST.AvyAct.Processor
             {
                 RadialSlider,
                 BoolToggle,
-                IntToggle
+                IntToggle,
             }
         }
 
@@ -94,7 +94,7 @@ namespace A1ST.AvyAct.Processor
                 {
                     directBlendTree = new AvyActData
                     {
-                        Actions = new List<AvyActAction> { action }
+                        Actions = new List<AvyActAction> { action },
                     };
                     directBlendTreesDict[action.parameter] = directBlendTree;
                 }
@@ -145,13 +145,13 @@ namespace A1ST.AvyAct.Processor
                     DefaultValueRoot = avatar.transform,
                     AssetContainer = assetContainer,
                     AssetKey = "AvyActAssetDBT",
-                    DefaultsProvider = new AacDefaultsProvider(writeDefaults: true)
+                    DefaultsProvider = new AacDefaultsProvider(writeDefaults: true),
                 }
             );
             var avyAct = new GameObject
             {
                 name = "AvyAct",
-                transform = { parent = avatar.transform }
+                transform = { parent = avatar.transform },
             };
             var ma = MaAc.Create(avyAct);
 
@@ -232,8 +232,7 @@ namespace A1ST.AvyAct.Processor
                     var rsSubClip = aac.CopyClip(
                         SubTreeClipAtTimestamp(rsOnClip, keyTimestamps[i])
                     );
-                    var step = 1f / (keyTimestamps.Count - 1);
-                    rsSubTree.WithAnimation(rsSubClip, i * step);
+                    rsSubTree.WithAnimation(rsSubClip, keyTimestamps[i] / keyTimestamps[^1]);
                 }
 
                 directBlendTrees[index].WithAnimation(rsSubTree, ones[index]);
@@ -378,15 +377,19 @@ namespace A1ST.AvyAct.Processor
             }
 
             foreach (var binding in tempBindingsL)
-                foreach (var relativePath in propagationRenderers.Select(gameObj => GetRelativePath(gameObj.transform, avatarTransform)))
-                {
-                    propagatedClip.SetCurve(
-                        relativePath,
-                        typeof(SkinnedMeshRenderer),
-                        binding.PropertyName,
-                        binding.Curve
-                    );
-                }
+            foreach (
+                var relativePath in propagationRenderers.Select(gameObj =>
+                    GetRelativePath(gameObj.transform, avatarTransform)
+                )
+            )
+            {
+                propagatedClip.SetCurve(
+                    relativePath,
+                    typeof(SkinnedMeshRenderer),
+                    binding.PropertyName,
+                    binding.Curve
+                );
+            }
 
             return propagatedClip;
 
