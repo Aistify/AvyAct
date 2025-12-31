@@ -73,12 +73,30 @@ namespace A1ST.AvyAct.Processor
             _allActions = Array.Empty<AvyActAction>();
         }
 
+        private static bool IsEditorOnly(GameObject obj)
+        {
+            var current = obj.transform;
+            while (current != null)
+            {
+                if (current.CompareTag("EditorOnly"))
+                    return true;
+                current = current.parent;
+            }
+            return false;
+        }
+
         public static void Preprocess(GameObject avatar)
         {
             _priorities = new List<int>();
             avatar.GetComponent<AvyActClipLoader>()?.Destroy();
             var directBlendTreesDict = new Dictionary<string, AvyActData>();
-            _allActions = avatar.GetComponentsInChildren<AvyActAction>(true);
+            _allActions = avatar
+                .GetComponentsInChildren<AvyActAction>(true)
+                .Where(action =>
+                    action != null && !action.Equals(null) && !IsEditorOnly(action.gameObject)
+                )
+                .ToArray();
+
             foreach (var action in _allActions)
             {
                 if (!IsValidAction(action))
